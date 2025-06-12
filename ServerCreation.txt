@@ -1,0 +1,97 @@
+Go to Control Panel > Programs > Programs and Features > Turn Windows features on or off.
+On a Windows Features window:
+Expand Internet Information Services > FTP Server and check FTP Service.
+Expand Internet Information Services > Web Management Tools and check IIS Management Console, if it is not checked yet.
+Confirm with OK button.
+Wait for the installation to complete.
+
+
+
+Opening IIS Manager
+Go to Control Panel > System and Security > Windows Tools (Administrative Tools on Windows 10 and older) and open Internet Information Services (IIS) Manager.
+Navigate to your Windows server node.
+
+
+--------------------------------------------
+
+Creating Certificate for the FTPS Server
+You need a TLS/SSL certificate to secure your FTP server. Ideally, you should acquire the certificate from a certificate authority.
+
+You may also create a self-signed certificate locally, but in such case users of your FTPS server will be warned, when connecting to the server.
+
+To create the self-signed certificate:
+
+In IIS Manager, open IIS > Server Certificates.
+Click on Create Self-Signed Certificate action.
+Specify a certificate name (e.g. “FTP Server”) and submit with OK.
+
+
+Self-signed certificates created by old versions of IIS Manager do not work with FTPS clients that check for key usage violations.2 To create a certificate with a correct key usage, use New-SelfSignedCertificate PowerShell as an Administrator:
+
+New-SelfSignedCertificate -FriendlyName "FTP Server" -CertStoreLocation cert:\localmachine\my -DnsName ftp.example.com
+Servers behind external Firewall/NAT
+If your server is behind an external firewall/NAT, you need to tell the FTP server its external IP address, to allow passive mode connections.
+
+In IIS Manager, open FTP > FTP Firewall Support.
+Specify your server’s external IP address.
+For Microsoft Azure Windows servers you will find the external IP address in Public IP address section of the virtual machine page.
+When behind an external firewall, you need to open ports for data connections (obviously in addition to opening an FTP port 21 and possibly an implicit TLS/SSL FTP port 990). You won’t probably want to open whole default port range 1024-65535. In such case, you need to tell the FTP server to use only the range that is opened on the firewall. Use a Data Channel Port Range box for that. Any time you change this range, you will need to restart FTP service. Learn how to open ports on Microsoft Azure.
+
+
+Click Apply action to submit your settings.
+
+
+
+Some external firewalls are able to monitor FTP control connection and automatically open and close the data connection ports as needed. So you do not need to have whole port range opened all the time, even when not in use. This won’t work with the secure FTPS as the control connection is encrypted and the firewall cannot monitor it.
+
+Windows Firewall Rules
+An internal Windows firewall is automatically configured with rules for the ports 21, 990 and 1024-65535 when IIS FTP server is installed.
+
+The rules are not enabled initially on some versions of Windows.3 To enable or change the rules, go to Control Panel > System and Security > Windows Defender Firewall4 > Advanced Settings > Inbound Rules and locate three “FTP server” rules. If the rules are not enabled, click on Actions > Enable Rule.
+
+Restarting FTP Service
+While the internal Windows firewall is automatically configured to open FTP ports when FTP server is installed, this change does not seem to apply, until FTP service is restarted. The same is true for changing data channel port range.
+
+To restart FTP service go to Control Panel > System and Security > Windows Tools (Administrative Tools on Windows 10 and older) and open Services. Locate Microsoft FTP Service and click Restart service.5
+
+Adding FTP Site
+To a Web Site
+If you want to add FTP server to manage your existing web site remotely, locate your web site node in IIS Manager and:
+
+Click Add FTP Publishing action.
+In Add FTP Site Publishing wizard:
+On an initial Binding and SSL Settings step, select Require SSL to disallow non-encrypted connections and select your certificate.
+On Authentication and Authorization Information step, select Basic authentication and make sure Anonymous authentication is not selected. Select which users (Windows accounts) you allow to connect to the server with what permissions. You can choose All users or select only some. Do not select Anonymous users.
+Submit with Finish button.
+Advertisement
+
+Your secure FTPS server is now running and can be connected to.
+
+
+
+Standalone FTP Site
+If you want to add a standalone FTP server to store/exchange files, locate Sites node (folder) of your Windows server in IIS Manager and:
+
+Click Add FTP Site action.
+In Add FTP Site wizard:
+On an initial Site Information step, give a name to your FTP site (if it’s the only site you are going to have, simple “FTP site” suffice) and specify a path to a folder on your server’s disk that is going to be accessible using FTP.
+On a Binding and SSL Settings step, select Require SSL to disallow non-encrypted connections and select your certificate.
+On Authentication and Authorization Information step, select Basic authentication and make sure Anonymous authentication is not selected. Select which users (Windows accounts) you allow to connect to the server with what permissions. You can choose All users or select only some. Do not select Anonymous users.
+Submit with Finish button.
+Your secure FTPS server is now running and can be connected to.
+
+Connecting to Your FTPS Server
+For connecting to a Microsoft Azure Windows instance, see a specific guide.
+
+Start WinSCP. Login Dialog will appear. On the dialog:
+
+Select FTP protocol and TLS/SSL Explicit encryption.
+Enter your Windows server hostname to Host name field. Avoid using an IP address to allow WinSCP to verify that the hostname matches with host the server’s certificate was issued to (not applicable to self-signed certificates).
+Specify username and password for Windows account you want to connect with (when using domain accounts, you need to specify a full username with format domain\username).
+You may want to save your session details to a site so you do not need to type them in every time you want to connect. Press Save button and type site name.
+Press Login to connect.
+If you are using self-signed certificate, you will be prompted to accept it.
+Advertisement
+
+
+

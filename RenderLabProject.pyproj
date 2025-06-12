@@ -21,7 +21,14 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ftps-server.py" />
     <Compile Include="RenderLabProject.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="objects\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="objects\index.html" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

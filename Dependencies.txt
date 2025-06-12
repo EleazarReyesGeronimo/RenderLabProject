@@ -1,0 +1,3 @@
+pywin32
+pip install pywin32
+$ pip3 install PyOpenSSL
