@@ -1,38 +1,97 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>FTPS Test - RenderFarm</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; }
-        .status { padding: 10px; margin: 10px 0; border-radius: 4px; }
-        .success { background: #d4edda; }
-        .error { background: #f8d7da; }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Render Farm - TlacuaTech</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h1>FTPS Upload Test</h1>
-        <p>Server: <code>localhost:2121</code></p>
-        <p>User: testuser | Password: testpass</p>
-        
-        <form method="post" enctype="multipart/form-data">
-            <input type="file" name="file" required>
-            <button type="submit">Upload File</button>
+    <div class="container mt-5">
+        <div class="p-5 mb-4 bg-light rounded-3">
+            <div class="container-fluid py-5">
+                <h1 class="display-5 fw-bold d-inline align-middle">TlacuaTech RenderLab</h1>
+                <p class="col-md-8 fs-4">renderiza tu proyecto en <code>blender</code> con un solo click.</p>
+                <!--
+                <p>
+                    Credenciales FTPS (para acceso manual):<br>
+                    Servidor: <code>localhost:{{ ftp_port }}</code><br>
+                    Usuario: <code>{{ ftp_user }}</code> | Contraseña: <code>{{ ftp_pass }}</code>
+                </p>
+                -->
+            </div>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="mb-5">
+            <div class="card">
+                <div class="card-header">
+                    <h3>1. Cargar Archivo y Configurar Render</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        ">
+                        <div class="col-md-6">
+                            <label for="file" class="form-label">"f>Archivo .blend</label>
+                            <input type="file" class="form-control" name="file" id="file" required accept=".blend">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="render_engine" class="form-label">Motor de Render</label>
+                            <select class="form-select" name="render_engine" id="render_engine">
+                                <option value="CYCLES" selected>Cycles</option>
+                                <option value="BLENDER_EEVEE">Eevee</option>
+                                <option value="WORKBENCH">Workbench</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="resolution_x" class="form-label">Resolución X (px)</label>
+                            <input type="number" class="form-control" name="resolution_x" id="resolution_x" value="1920" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="resolution_y" class="form-label">Resolución Y (px)</label>
+                            <input type="number" class="form-control" name="resolution_y" id="resolution_y" value="1080" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="frame_start" class="form-label">Frame Inicial</label>
+                            <input type="number" class="form-control" name="frame_start" id="frame_start" value="1" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="frame_end" class="form-label">Frame Final</label>
+                            <input type="number" class="form-control" name="frame_end" id="frame_end" value="1" required>
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">Subir y Añadir a la Cola de Render</button>
+                    </div>
+                </div>
+            </div>
         </form>
-        
+
         {% if message %}
-        <div class="status {{ message_class }}">{{ message }}</div>
+        <div class="alert {{ 'alert-success' if message_class == 'success' else 'alert-danger' }}" role="alert">
+            {{ message }}
+        </div>
         {% endif %}
-        
-        <div>
-            <h3>Files on server:</h3>
-            {% for file in files %}
-            <div>{{ file }}</div>
-            {% else %}
-            <p>No files uploaded yet</p>
-            {% endfor %}
+
+        <div class="card">
+            <div class="card-header">
+                <h3>2. Archivos en el Servidor</h3>
+            </div>
+            <ul class="list-group list-group-flush">
+                {% for file in files %}
+                <li class="list-group-item">{{ file }}</li>
+                {% else %}
+                <li class="list-group-item">Aún no se han subido archivos.</li>
+                {% endfor %}
+            </ul>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
